@@ -8,7 +8,7 @@ import adminAtom from "@/atoms/admin-atom";
 const Navbar = () => {
     const [adminMode, setAdminMode] = useAtom(adminAtom);
 
-    const handleAdminModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleAdminModeChange = () => {
         setAdminMode(!adminMode);
     };
 
