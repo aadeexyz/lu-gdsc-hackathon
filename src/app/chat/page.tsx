@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import Image from "next/image";
 import Yumi from "../assets/yumi.png";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -138,7 +139,9 @@ const Chat = () => {
                         <div className="flex gap-2">
                             {message.role == "assistant" ? (
                                 <Avatar>
-                                    <AvatarImage src={Yumi.src} />
+                                    <AvatarImage asChild src={Yumi.src}>
+                                        <Image src={Yumi} alt="Yumi" />
+                                    </AvatarImage>
                                     <AvatarFallback className="text-white">
                                         Y
                                     </AvatarFallback>
@@ -169,7 +172,9 @@ const Chat = () => {
                     >
                         <div className="flex gap-2">
                             <Avatar>
-                                <AvatarImage src={Yumi.src} />
+                                <AvatarImage asChild src={Yumi.src}>
+                                    <Image src={Yumi} alt="Yumi" />
+                                </AvatarImage>
                                 <AvatarFallback className="text-white">
                                     Y
                                 </AvatarFallback>
