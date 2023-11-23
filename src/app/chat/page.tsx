@@ -157,6 +157,17 @@ const Chat = () => {
             inputMessage !== "" &&
             !thinking
         ) {
+            if (adminMode) {
+                const updatedMessages: Chat[] = [
+                    ...messages,
+                    { role: "assistant", content: inputMessage },
+                ];
+                setMessages(updatedMessages);
+
+                setInputMessage("");
+
+                return;
+            }
             setThinking(true);
 
             e.preventDefault();
@@ -171,6 +182,31 @@ const Chat = () => {
 
             await chat(updatedMessages);
         }
+    };
+
+    const handleSend = async () => {
+        if (adminMode) {
+            const updatedMessages: Chat[] = [
+                ...messages,
+                { role: "assistant", content: inputMessage },
+            ];
+            setMessages(updatedMessages);
+
+            setInputMessage("");
+
+            return;
+        }
+        setThinking(true);
+
+        const updatedMessages: Chat[] = [
+            ...messages,
+            { role: "user", content: inputMessage },
+        ];
+        setMessages(updatedMessages);
+
+        setInputMessage("");
+
+        await chat(updatedMessages);
     };
 
     return (
@@ -266,17 +302,13 @@ const Chat = () => {
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
                         placeholder={
-                            adminMode
-                                ? messages[messages.length - 1].role ==
-                                  "assistant"
-                                    ? "Message as User"
-                                    : "Message as Yumi"
-                                : "Ask Yumi..."
+                            adminMode ? "Message as Yumi" : "Ask Yumi..."
                         }
                     />
                     <Button
                         className="absolute bottom-0 right-0 mb-4 mr-4 disabled:cursor-not-allowed"
                         disabled={thinking}
+                        onClick={handleSend}
                     >
                         <Send className="h-4 w-4" />
                     </Button>
