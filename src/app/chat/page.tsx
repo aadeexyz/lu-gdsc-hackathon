@@ -8,51 +8,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 
+type Chat = {
+    role: "system" | "user" | "assistant";
+    content: string;
+};
+
 const Chat = () => {
-    const [messages, setMessages] = useState([
+    const [messages, setMessages] = useState<Chat[]>([
         {
-            role: "agent",
-            content: "Hi, how can I help you today?",
-        },
-        {
-            role: "user",
-            content: "Hey, I'm having trouble with my account.",
-        },
-        {
-            role: "agent",
-            content: "What seems to be the problem?",
-        },
-        {
-            role: "user",
-            content: "I can't log in.",
-        },
-        {
-            role: "user",
-            content: "I can't log in.",
-        },
-        {
-            role: "user",
+            role: "assistant",
             content:
-                "In a serene and lush forest, there lies a hidden glade where the sun filters through the dense canopy, casting dappled shadows on the forest floor. Here, a variety of wildlife peacefully coexists, from graceful deer grazing in the clearings to nimble squirrels darting among the trees. The air is filled with the melodious chirping of birds, creating a symphony that resonates with the rustling leaves. A gentle stream meanders through the glade, its crystal-clear waters reflecting the vibrant hues of the surrounding flora. Amidst this natural beauty, a sense of tranquility prevails, offering a sanctuary from the hustle and bustle of the outside world. This hidden gem in the heart of the forest stands as a testament to the enduring splendor of nature, untouched and unspoiled by human hands.",
-        },
-        {
-            role: "agent",
-            content:
-                "In a serene and lush forest, there lies a hidden glade where the sun filters through the dense canopy, casting dappled shadows on the forest floor. Here, a variety of wildlife peacefully coexists, from graceful deer grazing in the clearings to nimble squirrels darting among the trees. The air is filled with the melodious chirping of birds, creating a symphony that resonates with the rustling leaves. A gentle stream meanders through the glade, its crystal-clear waters reflecting the vibrant hues of the surrounding flora. Amidst this natural beauty, a sense of tranquility prevails, offering a sanctuary from the hustle and bustle of the outside world. This hidden gem in the heart of the forest stands as a testament to the enduring splendor of nature, untouched and unspoiled by human hands.",
-        },
-        {
-            role: "user",
-            content:
-                "In a serene and lush forest, there lies a hidden glade where the sun filters through the dense canopy, casting dappled shadows on the forest floor. Here, a variety of wildlife peacefully coexists, from graceful deer grazing in the clearings to nimble squirrels darting among the trees. The air is filled with the melodious chirping of birds, creating a symphony that resonates with the rustling leaves. A gentle stream meanders through the glade, its crystal-clear waters reflecting the vibrant hues of the surrounding flora. Amidst this natural beauty, a sense of tranquility prevails, offering a sanctuary from the hustle and bustle of the outside world. This hidden gem in the heart of the forest stands as a testament to the enduring splendor of nature, untouched and unspoiled by human hands.",
-        },
-        {
-            role: "agent",
-            content:
-                "In a serene and lush forest, there lies a hidden glade where the sun filters through the dense canopy, casting dappled shadows on the forest floor. Here, a variety of wildlife peacefully coexists, from graceful deer grazing in the clearings to nimble squirrels darting among the trees. The air is filled with the melodious chirping of birds, creating a symphony that resonates with the rustling leaves. A gentle stream meanders through the glade, its crystal-clear waters reflecting the vibrant hues of the surrounding flora. Amidst this natural beauty, a sense of tranquility prevails, offering a sanctuary from the hustle and bustle of the outside world. This hidden gem in the heart of the forest stands as a testament to the enduring splendor of nature, untouched and unspoiled by human hands.",
+                "Hello, I'm Yumi! I see you're interested in this property. How can I assist you with this listing?",
         },
     ]);
 
     const [inputMessage, setInputMessage] = useState("");
+    const [thinking, setThinking] = useState(false);
+
     const textareaRef = useRef<HTMLTextAreaElement>(null);
     const lastMessageRef = useRef<HTMLDivElement>(null);
 
@@ -85,17 +57,61 @@ const Chat = () => {
         return () => clearTimeout(timer);
     }, [messages]);
 
+    const chat = async (updatedMessages: Chat[]) => {
+        try {
+            const res = await fetch("/api/chat", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    chats: updatedMessages,
+                }),
+            });
+
+            const data = await res.json();
+
+            setMessages([...updatedMessages, data.chat]);
+
+            setThinking(false);
+        } catch (e) {
+            setMessages([
+                ...updatedMessages,
+                {
+                    role: "assistant",
+                    content:
+                        "There was an internal Error. Please refresh the browser. Sorry for the inconvinience.",
+                },
+            ]);
+        }
+    };
+
     const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         setInputMessage(e.target.value);
     };
 
-    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (e.key === "Enter" && !e.shiftKey) {
+    const handleKeyDown = async (
+        e: React.KeyboardEvent<HTMLTextAreaElement>
+    ) => {
+        if (
+            e.key === "Enter" &&
+            !e.shiftKey &&
+            inputMessage !== "" &&
+            !thinking
+        ) {
+            setThinking(true);
+
             e.preventDefault();
 
-            setMessages([...messages, { role: "user", content: inputMessage }]);
+            const updatedMessages: Chat[] = [
+                ...messages,
+                { role: "user", content: inputMessage },
+            ];
+            setMessages(updatedMessages);
 
             setInputMessage("");
+
+            await chat(updatedMessages);
         }
     };
 
@@ -113,13 +129,13 @@ const Chat = () => {
                         style={{ whiteSpace: "pre-line" }}
                         className={cn(
                             "flex flex-col w-full rounded-lg px-3 py-4",
-                            message.role === "agent"
+                            message.role === "assistant"
                                 ? "bg-primary text-primary-foreground"
                                 : "bg-muted"
                         )}
                     >
                         <div className="flex gap-2">
-                            {message.role == "agent" ? (
+                            {message.role == "assistant" ? (
                                 <Avatar>
                                     <AvatarImage src={Yumi.src} />
                                     <AvatarFallback className="text-white">
@@ -134,7 +150,7 @@ const Chat = () => {
                                 </Avatar>
                             )}
                             <p className="flex flex-col justify-center font-semibold text-xl">
-                                {message.role == "agent" ? "Yumi" : "You"}
+                                {message.role == "assistant" ? "Yumi" : "You"}
                             </p>
                         </div>
                         <div className="flex">
@@ -157,7 +173,10 @@ const Chat = () => {
                         onKeyDown={handleKeyDown}
                         placeholder="Ask Yumi..."
                     />
-                    <Button className="absolute bottom-0 right-0 mb-4 mr-4">
+                    <Button
+                        className="absolute bottom-0 right-0 mb-4 mr-4 disabled:cursor-not-allowed"
+                        disabled={thinking}
+                    >
                         <Send className="h-4 w-4" />
                     </Button>
                 </div>
