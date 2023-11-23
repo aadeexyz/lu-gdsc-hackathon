@@ -28,7 +28,7 @@ const Chat = () => {
 
     useEffect(() => {
         if (url === "") {
-            redirect("/client?from=chat");
+            redirect("/?from=chat");
         }
     });
 
@@ -94,7 +94,15 @@ const Chat = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    chats: updatedMessages,
+                    chats: [
+                        {
+                            role: "user",
+                            content: `Here's details about a listing I'm interested in - in JSON format, help me answer the questions I have: ${JSON.stringify(
+                                listing
+                            )}`,
+                        },
+                        ...updatedMessages,
+                    ],
                 }),
             });
 
