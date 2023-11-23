@@ -4,13 +4,39 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { SendHorizontal } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useAtom } from "jotai";
+import urlAtom from "@/atoms/url-atom";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 const Client = () => {
-    const [url, setUrl] = useState("");
+    const [url, setUrl] = useAtom(urlAtom);
+    const [flyingUrl, setFlyingUrl] = useState("");
+
+    const { toast } = useToast();
+
+    const searchParams = useSearchParams();
+    const router = useRouter();
+
+    useEffect(() => {
+        const search = searchParams?.get("from");
+
+        if (search === "chat") {
+            toast({
+                variant: "destructive",
+                description: "Enter a listing URL to continue with the chat.",
+            });
+        }
+    }, [searchParams, toast]);
 
     const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUrl(e.target.value);
+        setFlyingUrl(e.target.value);
+    };
+
+    const handleClick = () => {
+        setUrl(flyingUrl);
+        router.push("/chat");
     };
 
     const isValidUrl = (string: string) => {
@@ -34,10 +60,14 @@ const Client = () => {
                         type="url"
                         id="url"
                         placeholder="Link"
-                        value={url}
+                        value={flyingUrl}
                         onChange={handleUrlChange}
                     />
-                    <Button className="text-lg" disabled={!isValidUrl(url)}>
+                    <Button
+                        className="text-lg"
+                        disabled={!isValidUrl(flyingUrl)}
+                        onClick={handleClick}
+                    >
                         <SendHorizontal size={24} />
                     </Button>
                 </div>

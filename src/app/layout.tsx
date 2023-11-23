@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
+import { Toaster } from "@/components/ui/toaster";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,6 +38,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                     <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full min-h-full mt-14">
                         {children}
                     </div>
+                    <Toaster />
                 </ThemeProvider>
             </body>
         </html>

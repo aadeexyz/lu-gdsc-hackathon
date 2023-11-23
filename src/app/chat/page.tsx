@@ -9,6 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { ThreeDots } from "react-loader-spinner";
+import urlAtom from "@/atoms/url-atom";
+import { useAtom } from "jotai";
+import { redirect } from "next/navigation";
 
 type Chat = {
     role: "system" | "user" | "assistant";
@@ -16,6 +19,14 @@ type Chat = {
 };
 
 const Chat = () => {
+    const [url] = useAtom(urlAtom);
+
+    useEffect(() => {
+        if (url === "") {
+            redirect("/client?from=chat");
+        }
+    });
+
     const [messages, setMessages] = useState<Chat[]>([
         {
             role: "assistant",
