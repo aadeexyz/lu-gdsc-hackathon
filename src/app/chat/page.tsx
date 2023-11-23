@@ -7,6 +7,7 @@ import Yumi from "../assets/yumi.png";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
+import { ThreeDots } from "react-loader-spinner";
 
 type Chat = {
     role: "system" | "user" | "assistant";
@@ -161,6 +162,38 @@ const Chat = () => {
                         </div>
                     </div>
                 ))}
+                {thinking && (
+                    <div
+                        ref={lastMessageRef}
+                        className="flex flex-col w-full rounded-lg px-3 py-4 bg-primary text-primary-foreground"
+                    >
+                        <div className="flex gap-2">
+                            <Avatar>
+                                <AvatarImage src={Yumi.src} />
+                                <AvatarFallback className="text-white">
+                                    Y
+                                </AvatarFallback>
+                            </Avatar>
+                            <p className="flex flex-col justify-center font-semibold text-xl">
+                                Yumi
+                            </p>
+                        </div>
+                        <div className="flex">
+                            <div className="min-w-[48px]"></div>
+                            <div className="flex w-full flex-col justify-center text-lg">
+                                <ThreeDots
+                                    height="50"
+                                    width="50"
+                                    radius="5"
+                                    color="#F9FAFB"
+                                    ariaLabel="three-dots-loading"
+                                    wrapperStyle={{}}
+                                    visible={true}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="fixed flex inset-x-0 bottom-0 bg-transparent backdrop-blur p-4 px-10 text-white">
