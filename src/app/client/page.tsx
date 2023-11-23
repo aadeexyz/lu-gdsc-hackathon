@@ -7,11 +7,29 @@ import { SendHorizontal } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import { useAtom } from "jotai";
 import urlAtom from "@/atoms/url-atom";
+import listingAtom from "@/atoms/listing-atom";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 
+type Listing = {
+    title: string;
+    price: string;
+    location: string;
+    listedOn: string;
+    unitDetails: string[];
+    description: string[];
+    walkScore: string[];
+    transitScore: string[];
+    bikeScore: string[];
+    nearByTransit: string[][];
+    sellerName: string;
+    whenJoined: string;
+};
+
 const Client = () => {
     const [url, setUrl] = useAtom(urlAtom);
+    const [listing, setListing] = useAtom(listingAtom);
+
     const [flyingUrl, setFlyingUrl] = useState("");
 
     const { toast } = useToast();
@@ -30,13 +48,42 @@ const Client = () => {
         }
     }, [searchParams, toast]);
 
+    useEffect(() => {
+        if (listing) {
+            router.push("/chat");
+        }
+    }, [listing, router]);
+
     const handleUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFlyingUrl(e.target.value);
     };
 
-    const handleClick = () => {
+    const handleUrl = async () => {
+        try {
+            const res = await fetch(`/api/url?url=${flyingUrl}`);
+            const data = await res.json();
+            const listing = data.listing as Listing;
+
+            setListing(listing);
+        } catch {
+            toast({
+                variant: "destructive",
+                description:
+                    "Something went wrong. Please try again with a different URL.",
+            });
+        }
+    };
+
+    const handleClick = async () => {
         setUrl(flyingUrl);
-        router.push("/chat");
+
+        await handleUrl();
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter" && isValidUrl(flyingUrl)) {
+            handleClick();
+        }
     };
 
     const isValidUrl = (string: string) => {
@@ -62,6 +109,7 @@ const Client = () => {
                         placeholder="Link"
                         value={flyingUrl}
                         onChange={handleUrlChange}
+                        onKeyDown={handleKeyDown}
                     />
                     <Button
                         className="text-lg"

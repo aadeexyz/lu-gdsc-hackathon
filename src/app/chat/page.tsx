@@ -10,8 +10,11 @@ import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
 import { ThreeDots } from "react-loader-spinner";
 import urlAtom from "@/atoms/url-atom";
+import adminAtom from "@/atoms/admin-atom";
+import listingAton from "@/atoms/listing-atom";
 import { useAtom } from "jotai";
 import { redirect } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 type Chat = {
     role: "system" | "user" | "assistant";
@@ -20,6 +23,8 @@ type Chat = {
 
 const Chat = () => {
     const [url] = useAtom(urlAtom);
+    const [adminMode] = useAtom(adminAtom);
+    const [listing] = useAtom(listingAton);
 
     useEffect(() => {
         if (url === "") {
@@ -27,11 +32,14 @@ const Chat = () => {
         }
     });
 
+    const { toast } = useToast();
+
     const [messages, setMessages] = useState<Chat[]>([
         {
             role: "assistant",
-            content:
-                "Hello, I'm Yumi! I see you're interested in this property. How can I assist you with this listing?",
+            content: `Hello, I'm Yumi! I see you're interested in this property. How can I assist you with this listing? ${JSON.stringify(
+                listing
+            )}`,
         },
     ]);
 
@@ -70,6 +78,16 @@ const Chat = () => {
         return () => clearTimeout(timer);
     }, [messages]);
 
+    const bookedByBot = () => {
+        toast({
+            description: "A viewing was booked for the property.",
+        });
+    };
+
+    const openForm = () => {
+        const form = window.open("/form", "_blank");
+    };
+
     const chat = async (updatedMessages: Chat[]) => {
         try {
             const res = await fetch("/api/chat", {
@@ -84,7 +102,28 @@ const Chat = () => {
 
             const data = await res.json();
 
-            setMessages([...updatedMessages, data.chat]);
+            let content = data.chat.content;
+
+            if (content.includes("---viewingbookedfunction---")) {
+                bookedByBot();
+
+                content = data.chat.content.replace(
+                    "---viewingbookedfunction---",
+                    ""
+                );
+            } else if (content.includes("---viewingformfunction---")) {
+                openForm();
+
+                content = data.chat.content.replace(
+                    "---viewingformfunction---",
+                    ""
+                );
+            }
+
+            setMessages([
+                ...updatedMessages,
+                { role: "assistant", content: content },
+            ]);
 
             setThinking(false);
         } catch (e) {
@@ -160,7 +199,7 @@ const Chat = () => {
                             ) : (
                                 <Avatar>
                                     <AvatarFallback className="text-primary-foreground bg-primary">
-                                        U
+                                        Y
                                     </AvatarFallback>
                                 </Avatar>
                             )}
@@ -220,7 +259,14 @@ const Chat = () => {
                         value={inputMessage}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
-                        placeholder="Ask Yumi..."
+                        placeholder={
+                            adminMode
+                                ? messages[messages.length - 1].role ==
+                                  "assistant"
+                                    ? "Message as User"
+                                    : "Message as Yumi"
+                                : "Ask Yumi..."
+                        }
                     />
                     <Button
                         className="absolute bottom-0 right-0 mb-4 mr-4 disabled:cursor-not-allowed"
