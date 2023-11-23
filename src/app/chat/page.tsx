@@ -147,7 +147,7 @@ const Chat = () => {
                 ))}
             </div>
 
-            <div className="fixed flex inset-x-0 bottom-0 bg-transparent backdrop-blur p-4 text-white">
+            <div className="fixed flex inset-x-0 bottom-0 bg-transparent backdrop-blur p-4 px-10 text-white">
                 <div className="relative flex items-end w-full">
                     <Textarea
                         className="text-lg resize-none overflow-hidden min-h-[20px] w-full pr-20"

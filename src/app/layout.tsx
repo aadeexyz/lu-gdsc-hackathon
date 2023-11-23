@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
-import { Card, CardContent } from "@/components/ui/card";
 import "./globals.css";
+import { Navbar } from "@/components/navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,14 +24,17 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
               }`}
                 </style>
             </head>
-            <body className={`${inter.className} flex justify-center p-4`}>
+            <body
+                className={`${inter.className} flex justify-center p-4 px-10`}
+            >
                 <ThemeProvider
                     attribute="class"
                     defaultTheme="dark"
                     enableSystem
                     disableTransitionOnChange
                 >
-                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full min-h-full">
+                    <Navbar />
+                    <div className="rounded-lg border bg-card text-card-foreground shadow-sm w-full min-h-full mt-14">
                         {children}
                     </div>
                 </ThemeProvider>
