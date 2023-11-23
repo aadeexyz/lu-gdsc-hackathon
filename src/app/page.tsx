@@ -11,6 +11,8 @@ import listingAtom from "@/atoms/listing-atom";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
 import { ThreeDots } from "react-loader-spinner";
+import Logo from "@/assets/logo.png";
+import Image from "next/image";
 
 type Listing = {
     title: string;
@@ -101,6 +103,7 @@ const Client = () => {
     return (
         <main className="flex h-full space-y-3 flex-col items-center justify-center">
             <div className="grid w-full max-w-sm items-center gap-2">
+                <Image src={Logo} alt="logo" />
                 <Label className="text-lg" htmlFor="url">
                     Link to the listing{" "}
                     <p className="text-sm">

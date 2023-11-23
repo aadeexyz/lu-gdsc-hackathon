@@ -3,6 +3,7 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { Calendar } from "@/components/ui/calendar";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -10,6 +11,7 @@ const Form = () => {
     const [name, setName] = useState("");
     const [phoneNumber, setPhoneNumber] = useState("");
     const [emailId, setEmailId] = useState("");
+    const [date, setDate] = useState<Date | undefined>(new Date());
 
     const { toast } = useToast();
 
@@ -28,16 +30,17 @@ const Form = () => {
     };
 
     const isValid = () => {
-        return name && phoneNumber && emailId;
+        return name && phoneNumber && emailId && date;
     };
 
     const clicked = () => {
         setName("");
         setPhoneNumber("");
         setEmailId("");
+        setDate(new Date());
 
         toast({
-            description: "We have scheduled a viewing.",
+            description: `We have scheduled a viewing for ${date?.getMonth()} ${date?.getDate()}.`,
         });
     };
 
@@ -68,6 +71,14 @@ const Form = () => {
                     className="text-lg"
                     value={emailId}
                     onChange={handleEmailIdChange}
+                />
+            </div>
+            <div>
+                <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    className="rounded-md border"
                 />
             </div>
             <div>
