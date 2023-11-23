@@ -246,7 +246,7 @@ const Chat = () => {
                                     height="50"
                                     width="50"
                                     radius="5"
-                                    color="#F9FAFB"
+                                    color="##030712"
                                     ariaLabel="three-dots-loading"
                                     wrapperStyle={{}}
                                     visible={true}
@@ -257,7 +257,7 @@ const Chat = () => {
                 )}
             </div>
 
-            <div className="fixed flex inset-x-0 bottom-0 bg-transparent backdrop-blur p-4 px-10 text-white">
+            <div className="fixed flex inset-x-0 bottom-0 bg-transparent backdrop-blur p-4 px-10 text-[#030712]">
                 <div className="relative flex items-end w-full">
                     <Textarea
                         className="text-lg resize-none overflow-hidden min-h-[20px] w-full pr-20"

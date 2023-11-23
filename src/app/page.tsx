@@ -133,7 +133,7 @@ const Client = () => {
                         height="50"
                         width="50"
                         radius="5"
-                        color="#F9FAFB"
+                        color="#030712"
                         ariaLabel="three-dots-loading"
                         wrapperStyle={{}}
                         visible={true}
