@@ -37,9 +37,7 @@ const Chat = () => {
     const [messages, setMessages] = useState<Chat[]>([
         {
             role: "assistant",
-            content: `Hello, I'm Yumi! I see you're interested in this property. How can I assist you with this listing? ${JSON.stringify(
-                listing
-            )}`,
+            content: `Hello, I'm Yumi! I see you're interested in this property. How can I assist you with this listing?`,
         },
     ]);
 
