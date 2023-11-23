@@ -1,9 +1,11 @@
-import {Button} from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Button>Yumi</Button>
-    </main>
-  )
-}
+const Home = () => {
+    return (
+        <main className="flex min-h-screen flex-col items-center justify-between p-24">
+            <Button>Yumi</Button>
+        </main>
+    );
+};
+
+export default Home;
