@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import Yumi from "../assets/yumi.png";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Send } from "lucide-react";
 
 const Chat = () => {
     const [messages, setMessages] = useState([
@@ -51,15 +53,66 @@ const Chat = () => {
     ]);
 
     const [inputMessage, setInputMessage] = useState("");
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
+    const lastMessageRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const textarea = textareaRef.current;
+        if (textarea) {
+            const lineHeight = 20;
+            const maxLines = 6;
+            const maxHeight = lineHeight * maxLines;
+
+            textarea.style.height = "auto";
+            const newHeight = Math.min(textarea.scrollHeight, maxHeight);
+            textarea.style.height = `${newHeight}px`;
+
+            if (textarea.scrollHeight > maxHeight) {
+                textarea.style.overflowY = "auto";
+            } else {
+                textarea.style.overflowY = "hidden";
+            }
+        }
+    }, [inputMessage]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (lastMessageRef.current) {
+                lastMessageRef.current.scrollIntoView({ behavior: "smooth" });
+            }
+        }, 100);
+
+        return () => clearTimeout(timer);
+    }, [messages]);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setInputMessage(e.target.value);
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+
+            setMessages([...messages, { role: "user", content: inputMessage }]);
+
+            setInputMessage("");
+        }
+    };
 
     return (
         <>
-            <div className="space-y-4 p-4">
+            <div className="space-y-4 p-4 mb-20">
                 {messages.map((message, index) => (
                     <div
                         key={index}
+                        ref={
+                            index === messages.length - 1
+                                ? lastMessageRef
+                                : null
+                        }
+                        style={{ whiteSpace: "pre-line" }}
                         className={cn(
-                            "flex flex-col w-full rounded-lg px-3 py-4 text-sm",
+                            "flex flex-col w-full rounded-lg px-3 py-4",
                             message.role === "agent"
                                 ? "bg-primary text-primary-foreground"
                                 : "bg-muted"
@@ -80,8 +133,8 @@ const Chat = () => {
                                     </AvatarFallback>
                                 </Avatar>
                             )}
-                            <p className="flex flex-col justify-center font-semibold text-lg">
-                                {message.role == "agent" ? "Yumi" : "User"}
+                            <p className="flex flex-col justify-center font-semibold text-xl">
+                                {message.role == "agent" ? "Yumi" : "You"}
                             </p>
                         </div>
                         <div className="flex">
@@ -94,8 +147,20 @@ const Chat = () => {
                 ))}
             </div>
 
-            <div className="fixed inset-x-0 bottom-0 bg-transparent backdrop-blur p-4 text-white">
-                Hello
+            <div className="fixed flex inset-x-0 bottom-0 bg-transparent backdrop-blur p-4 text-white">
+                <div className="relative flex items-end w-full">
+                    <Textarea
+                        className="text-lg resize-none overflow-hidden min-h-[20px] w-full pr-20"
+                        ref={textareaRef}
+                        value={inputMessage}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Ask Yumi..."
+                    />
+                    <Button className="absolute bottom-0 right-0 mb-4 mr-4">
+                        <Send className="h-4 w-4" />
+                    </Button>
+                </div>
             </div>
         </>
     );
