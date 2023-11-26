@@ -1,0 +1,6 @@
+[submodule "apps/aggregator"]
+	path = apps/aggregator
+	url = https://github.com/ttran15/hackathon.git
+[submodule "apps/scrapper"]
+	path = apps/scrapper
+	url = https://github.com/bskdany/HackatonFBbot.git
